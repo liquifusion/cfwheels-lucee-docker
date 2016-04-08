@@ -101,6 +101,25 @@
 	<cfreturn arguments.value>
 </cffunction>
 
+<cffunction name="$cleanInlist" returntype="any" access="public" output="false">
+	<cfargument name="where" type="string" required="true">
+	<cfscript>
+		var loc = {};
+		loc.rv = arguments.where;
+		loc.regex = "IN\s?\(.*?,\s.*?\)";
+		loc.in = REFind(loc.regex, loc.rv, 1, true);
+		while (loc.in.len[1])
+		{
+			loc.str = Mid(loc.rv, loc.in.pos[1], loc.in.len[1]);
+			loc.rv = RemoveChars(loc.rv, loc.in.pos[1], loc.in.len[1]);
+			loc.cleaned = $listClean(loc.str);
+			loc.rv = Insert(loc.cleaned, loc.rv, loc.in.pos[1]-1);
+			loc.in = REFind(loc.regex, loc.rv, loc.in.pos[1] + Len(loc.cleaned), true);
+		}
+	</cfscript>
+	<cfreturn loc.rv>
+</cffunction>
+
 <cffunction name="$listClean" returntype="any" access="public" output="false" hint="removes whitespace between list elements. optional argument to return the list as an array.">
 	<cfargument name="list" type="string" required="true">
 	<cfargument name="delim" type="string" required="false" default=",">
@@ -146,7 +165,7 @@
 				loc.rv = SerializeJSON(loc.values);
 
 				// remove the characters that indicate array or struct so that we can sort it as a list below
-				loc.rv = ReplaceList(loc.rv, "{,},[,]", ",,,");
+				loc.rv = ReplaceList(loc.rv, "{,},[,],/", ",,,,");
 				loc.rv = ListSort(loc.rv, "text");
 			}
 			catch (any e)
@@ -238,11 +257,7 @@
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++)
 		{
 			loc.item = ListGetAt(arguments.keys, loc.i);
-			loc.rv[loc.item] = "";
-			if (StructKeyExists(arguments.scope, loc.item))
-			{
-				loc.rv[loc.item] = arguments.scope[loc.item];
-			}
+			loc.rv[loc.item] = arguments.scope[loc.item];
 		}
 
 		// fix path_info if it contains any characters that are not ascii (see issue 138)
@@ -980,6 +995,45 @@
 		if (StructKeyExists(application, "$wheels"))
 		{
 			loc.rv = "$wheels";
+		}
+	</cfscript>
+	<cfreturn loc.rv>
+</cffunction>
+
+<cffunction name="$prependUrl" returntype="string" access="public" output="false">
+	<cfargument name="path" type="string" required="true">
+	<cfscript>
+		var loc = {};
+		loc.rv = arguments.path;
+		if (arguments.port != 0)
+		{
+			// use the port that was passed in by the developer
+			loc.rv = ":" & arguments.port & loc.rv;
+		}
+		else if (request.cgi.server_port != 80 && request.cgi.server_port != 443)
+		{
+			// if the port currently in use is not 80 or 443 we set it explicitly in the URL
+			loc.rv = ":" & request.cgi.server_port & loc.rv;
+		}
+		if (Len(arguments.host))
+		{
+			loc.rv = arguments.host & loc.rv;
+		}
+		else
+		{
+			loc.rv = request.cgi.server_name & loc.rv;
+		}
+		if (Len(arguments.protocol))
+		{
+			loc.rv = arguments.protocol & "://" & loc.rv;
+		}
+		else if (request.cgi.server_port_secure)
+		{
+			loc.rv = "https://" & loc.rv;
+		}
+		else
+		{
+			loc.rv = "http://" & loc.rv;
 		}
 	</cfscript>
 	<cfreturn loc.rv>

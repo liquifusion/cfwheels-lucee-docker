@@ -68,7 +68,11 @@
 			loc.onsubmit = "return confirm('#JSStringFormat(arguments.confirm)#');";
 			arguments.onsubmit = $addToJavaScriptAttribute(name="onsubmit", content=loc.onsubmit, attributes=arguments);
 		}
-		loc.content = submitTag(value=arguments.text, image=arguments.image, disable=arguments.disable);
+		loc.args = $innerArgs(name="input", args=arguments);
+		loc.args.value = arguments.text;
+		loc.args.image = arguments.image;
+		loc.args.disable = arguments.disable;
+		loc.content = submitTag(argumentCollection=loc.args);
 		loc.skip = "disable,image,text,confirm,route,controller,key,params,anchor,onlyPath,host,protocol,port";
 		if (Len(arguments.route))
 		{
@@ -180,7 +184,7 @@
 							loc.linkToArguments.params &= "&" & arguments.params;
 						}
 					}
-					loc.linkToArguments.text = loc.pageNumber;
+					loc.linkToArguments.text = NumberFormat(loc.pageNumber);
 					if (Len(arguments.prependToPage) && arguments.prependOnAnchor)
 					{
 						loc.start &= arguments.prependToPage;
@@ -210,7 +214,7 @@
 							loc.linkToArguments.params &= "&" & arguments.params;
 						}
 					}
-					loc.linkToArguments.text = loc.i;
+					loc.linkToArguments.text = NumberFormat(loc.i);
 					if (Len(arguments.classForCurrent) && loc.currentPage == loc.i)
 					{
 						// apply the classForCurrent class if specified and this is the current page
@@ -238,11 +242,11 @@
 					{
 						if (Len(arguments.classForCurrent))
 						{
-							loc.middle &= $element(name="span", content=loc.i, class=arguments.classForCurrent);
+							loc.middle &= $element(name="span", content=NumberFormat(loc.i), class=arguments.classForCurrent);
 						}
 						else
 						{
-							loc.middle &= loc.i;
+							loc.middle &= NumberFormat(loc.i);
 						}
 					}
 					if (Len(arguments.appendToPage))
@@ -267,7 +271,7 @@
 							loc.linkToArguments.params &= "&" & arguments.params;
 						}
 					}
-					loc.linkToArguments.text = loc.totalPages;
+					loc.linkToArguments.text = NumberFormat(loc.totalPages);
 					loc.end &= arguments.anchorDivider;
 					if (Len(arguments.prependToPage) && arguments.prependOnAnchor)
 					{

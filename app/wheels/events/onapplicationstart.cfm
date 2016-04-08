@@ -46,8 +46,12 @@
 		request.cgi = $cgiScope();
 
 		// set up containers for routes, caches, settings etc
-		application.$wheels.version = "1.4.1";
-		application.$wheels.hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName();
+		application.$wheels.version = "1.4.5";
+		try
+		{
+			application.$wheels.hostName = CreateObject("java", "java.net.InetAddress").getLocalHost().getHostName();
+		}
+		catch (any e) {}
 		application.$wheels.controllers = {};
 		application.$wheels.models = {};
 		application.$wheels.existingHelperFiles = "";
@@ -278,7 +282,7 @@
 		application.$wheels.functions.hiddenField = {};
 		application.$wheels.functions.highlight = {delimiter=",", tag="span", class="highlight"};
 		application.$wheels.functions.hourSelectTag = {label="", labelPlacement="around", prepend="", append="", prependToLabel="", appendToLabel="", includeBlank=false, twelveHour=false};
-		application.$wheels.functions.imageTag = {};
+		application.$wheels.functions.imageTag = {onlyPath=true, host="", protocol="", port=0};
 		application.$wheels.functions.includePartial = {layout="", spacer="", dataFunction=true};
 		application.$wheels.functions.javaScriptIncludeTag = {type="text/javascript", head=false};
 		application.$wheels.functions.linkTo = {onlyPath=true, host="", protocol="", port=0};
@@ -349,9 +353,9 @@
 		$include(template="config/#application.$wheels.environment#/settings.cfm");
 
 		// clear query (cfquery) and page (cfcache) caches
-		if (application.$wheels.clearQueryCacheOnReload)
+		if (application.$wheels.clearQueryCacheOnReload || !StructKeyExists(application.$wheels, "cachekey"))
 		{
-			$objectcache(action="clear");
+			application.$wheels.cachekey = Hash(CreateUUID());
 		}
 		if (application.$wheels.clearServerCacheOnReload)
 		{

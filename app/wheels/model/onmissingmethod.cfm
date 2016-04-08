@@ -150,17 +150,23 @@
 		}
 		loc.value = arguments.missingMethodArguments[loc.property];
 
-		loc.object = findOne(where=$keyWhereString(loc.property, loc.value));
+		// setup arguments for passing in to findOne and create
+		StructDelete(arguments, "missingMethodName");
+		StructDelete(arguments.missingMethodArguments, loc.property);
+		StructAppend(arguments, arguments.missingMethodArguments);
+		StructDelete(arguments, "missingMethodArguments");
+		
+		// add where argument for findOne and remove afterwards
+		arguments.where = $keyWhereString(loc.property, loc.value);
+		loc.object = findOne(argumentCollection=arguments);
+		StructDelete(arguments, "where");
+
 		if (IsObject(loc.object))
 		{
 			loc.rv = loc.object;
 		}
 		else
 		{
-			StructDelete(arguments, "missingMethodName");
-			StructDelete(arguments.missingMethodArguments, loc.property);
-			StructAppend(arguments, arguments.missingMethodArguments);
-			StructDelete(arguments, "missingMethodArguments");
 			arguments[loc.property] = loc.value;
 			if (loc.save)
 			{
@@ -318,7 +324,12 @@
 					loc.singularKey = singularize(loc.key);
 
 					// create a generic method name (example: "hasComments" becomes "hasObjects")
-					loc.name = ReplaceNoCase(ReplaceNoCase(arguments.missingMethodName, loc.key, "objects"), loc.singularKey, "object");
+					loc.name = ReplaceNoCase(arguments.missingMethodName, loc.key, "objects");
+					if (loc.name == arguments.missingMethodName)
+					{
+						// we should never change anything more than once so if the plural version was already replaced we do not need to replace the singular one
+						loc.name = ReplaceNoCase(loc.name, loc.singularKey, "object");
+					}
 
 					if (loc.name == "objects")
 					{

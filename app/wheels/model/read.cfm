@@ -25,6 +25,7 @@
 		var loc = {};
 		$args(name="findAll", args=arguments);
 		arguments.include = $listClean(arguments.include);
+		arguments.where = $cleanInList(arguments.where);
 
 		// we only allow direct associations to be loaded when returning objects
 		if (application.wheels.showErrorInformation && Len(arguments.returnAs) && arguments.returnAs != "query" && Find("(", arguments.include) && arguments.returnIncluded)
@@ -100,7 +101,7 @@
 				}
 				else
 				{
-					loc.values = findAll($limit=loc.limit, $offset=loc.offset, select=primaryKeys(), where=arguments.where, order=arguments.order, include=arguments.include, reload=arguments.reload, cache=arguments.cache, distinct=loc.distinct, parameterize=arguments.parameterize, includeSoftDeletes=arguments.includeSoftDeletes);
+					loc.values = findAll($limit=loc.limit, $offset=loc.offset, select=primaryKeys(), where=arguments.where, order=arguments.order, include=arguments.include, reload=arguments.reload, cache=arguments.cache, distinct=loc.distinct, parameterize=arguments.parameterize, includeSoftDeletes=arguments.includeSoftDeletes, callbacks=false);
 					if (loc.values.RecordCount)
 					{
 						loc.paginationWhere = "";
@@ -342,6 +343,7 @@
 		loc.delimiter = arguments.delimiter;
 		StructDelete(arguments, "delimiter");
 		arguments.select = primaryKey();
+		arguments.callbacks = false;
 		loc.query = findAll(argumentCollection=arguments);
 		if (loc.quoted)
 		{
