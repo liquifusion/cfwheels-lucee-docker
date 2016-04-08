@@ -8,6 +8,8 @@ A [Docker][1] container for [CFWheels][2] applications running on [Lucee][3] and
 -   Lucee 5 scripting engine
 -   Latest version of CFWheels, modified to use environment variables for configuration
 -   NGINX web server with URL rewriting enabled for CFWheels
+-   Lucee administrator blocked from web access completely. (Data source and SMTP settings are configured in
+    `docker-compose.yml` in development and environment variables in production.)
 
 ## Development requirements
 
@@ -48,6 +50,20 @@ my advice and installed Docker Machine) to make sure you should in fact be hitti
 address.)
 
 To stop the application, press `Ctrl + C`.
+
+## Developing your application
+
+Continue coding your CFWheels application as normal in the `app/` subfolder.
+
+Here are some bonus features that make life easier :party::
+
+-  The `reloadPassword` is now configured in `docker-compose.yml` via `WHEELS_RELOAD_PW` instead of being hardcoded
+   into an environment file in the `config/` folder. This means you can develop without a `reloadPassword` and
+   configure it as an environment variable in production (where it actually matters).
+-  The CFWheels `envionment` is also configured in `docker-compose.yml` via `WHEELS_ENV`. No more accidentally
+   deploying a `config/environment` file to production with a setting of `development`!
+-  There is no Lucee Administrator. Everything is configured "headless" via environment variables. This makes Lucee
+   work in a Docker-friendly way where the app can be wiped and rebuilt completely on each deploy.
 
 
 [1]: https://www.docker.com/
