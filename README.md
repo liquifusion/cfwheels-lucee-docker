@@ -55,7 +55,7 @@ To stop the application, press `Ctrl + C`.
 
 Continue coding your CFWheels application as normal in the `app/` subfolder.
 
-Here are some bonus features that make life easier :party::
+Here are some bonus features that make life easier :tada::
 
 -  The `reloadPassword` is now configured in `docker-compose.yml` via `WHEELS_RELOAD_PW` instead of being hardcoded
    into an environment file in the `config/` folder. This means you can develop without a `reloadPassword` and
