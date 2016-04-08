@@ -61,7 +61,7 @@ Here are some bonus features that make life easier :party::
    into an environment file in the `config/` folder. This means you can develop without a `reloadPassword` and
    configure it as an environment variable in production (where it actually matters).
 -  The CFWheels `envionment` is also configured in `docker-compose.yml` via `WHEELS_ENV`. No more accidentally
-   deploying a `config/environment` file to production with a setting of `development`!
+   deploying a `config/environment.cfm` file to production with a setting of `development`!
 -  There is no Lucee Administrator. Everything is configured "headless" via environment variables. This makes Lucee
    work in a Docker-friendly way where the app can be wiped and rebuilt completely on each deploy.
 
